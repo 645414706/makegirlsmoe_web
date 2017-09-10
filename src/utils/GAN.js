@@ -21,15 +21,15 @@ class GAN {
         return 'http://' + (servers[index].host || servers[index]) + Config.gan.model;
     }
 
-    async init(onInitProgress) {
-        this.runner = await window.WebDNN.load(Config.gan.model, {progressCallback: onInitProgress, weightDirectory: await GAN.getWeightFilePrefix(), backendOrder: ['webgpu', 'webgl', 'webassembly', 'fallback']});
+    async init(onInitProgress, backend) {
+        this.runner = await window.WebDNN.load(Config.gan.model, {progressCallback: onInitProgress, weightDirectory: await GAN.getWeightFilePrefix(), backendOrder: backend});
     }
 
-    async run(label, noise) {
+    async run(label, noise, input) {
         this.currentNoise = noise || Array.apply(null, {length: Config.gan.noiseLength}).map(() => Utils.randomNormal());
-        let input = this.currentNoise.concat(label);
-        this.currentInput = input;
-        this.runner.getInputViews()[0].set(input);
+        let tmp = this.currentNoise.concat(label);
+        this.currentInput = input || tmp;
+        this.runner.getInputViews()[0].set(this.currentInput);
         await this.runner.run();
         let output = this.runner.getOutputViews()[0].toActual();
         return output;

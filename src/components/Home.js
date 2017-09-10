@@ -72,17 +72,36 @@ class Home extends Component {
 
         try {
             var startTime = new Date();
-            await this.gan.init((current, total) => this.setState({gan: Object.assign({}, this.state.gan, {loadingProgress: current / total * 100})}));
+            var ganWebgl = new GAN();
+            await ganWebgl.init((current, total) => this.setState({gan: Object.assign({}, this.state.gan, {loadingProgress: current / total * 50})}), ['webgl']);
+            await this.gan.init((current, total) => this.setState({gan: Object.assign({}, this.state.gan, {loadingProgress: current / total * 50 + 50})}));
             var endTime = new Date();
             var loadTime = (endTime.getTime() - startTime.getTime()) / 1000;
         }
         catch (err) {
+            console.log(err);
             this.setState({gan: Object.assign({}, this.state.gan, {isError: true})});
             return;
         }
 
         Stat.modelLoaded(loadTime);
         this.setState({gan: {isReady: true}});
+
+        window.setInput = input => localStorage.input = JSON.stringify(input);
+        window.runWebgl = async () => {
+            var input = JSON.parse(localStorage.input);
+            var output = await ganWebgl.run(null, null, input);
+            this.setState({optionURI: URL.createObjectURL(new Blob([JSON.stringify(output)]))}, () => {
+                this.refs.jsonDownloader.click();
+            });
+        };
+        window.runNormal = async () => {
+            var input = JSON.parse(localStorage.input);
+            var output = await this.gan.run(null, null, input);
+            this.setState({optionURI: URL.createObjectURL(new Blob([JSON.stringify(output)]))}, () => {
+                this.refs.jsonDownloader.click();
+            });
+        };
     }
 
     showTwitterTimeline() {
@@ -354,7 +373,7 @@ class Home extends Component {
                     ref={dialog => this.dialog = dialog}
                     title="Note"
                     message="You are using mobile data network. We strongly recommend you to connect to Wi-Fi when accessing this website. Are you sure to continue?" />
-                <a href={this.state.optionURI} download="MakeGirlsMoe-Options.json" target="_blank" ref="jsonDownloader" style={{display: "none"}}>Download JSON</a>
+                <a href={this.state.optionURI} download="output.json" target="_blank" ref="jsonDownloader" style={{display: "none"}}>Download JSON</a>
                 <input type="file" accept="application/json" ref="jsonUploader" style={{display: "none"}} onChange={(event) => this.importJSON(event)} onClick={(event)=> {event.target.value = null}} />
 
             </div>

@@ -12,7 +12,7 @@ class ImageEncoder {
             scale: [127.5, 127.5, 127.5],
             bias: [127.5, 127.5, 127.5],
             color: window.WebDNN.Image.Color.BGR,
-            order: window.WebDNN.Image.Order.HWC
+            order: window.WebDNN.Image.Order.CHW
         });
 
         return canvas.toDataURL();

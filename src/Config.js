@@ -1,4 +1,4 @@
-var debug = false;
+var debug = true;
 var backendUrlPrefix = (debug ? 'http://localhost:6253' : '');
 var frontendUrlPrefix = (debug ? 'http://localhost:3000' : '');
 
@@ -76,7 +76,7 @@ var Config = {
         labelLength: 34,
         imageWidth: 128,
         imageHeight: 128,
-        model: '/models/model_resnet_with_condition_128_full_1',
+        model: '/models/model_resnet_with_condition_128_full_1_test',
         modelServers: debug ? ['localhost:3000'] : ['maketest.girls.moe']
     },
     stat: {
